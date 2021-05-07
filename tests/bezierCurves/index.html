@@ -1,0 +1,87 @@
+
+<canvas id="canvas" width="500" height="250"></canvas>
+
+<script type="text/javascript">
+
+"use strict";
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+
+//ctx.beginPath();
+//for (var y = 10; y < 100; y += 10) {
+//	ctx.moveTo(10 + y , y);
+//	ctx.lineTo(90, y);
+//}
+//ctx.stroke();
+
+class Point {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+
+// t E (0,1)
+// x = (1-t)^2*x(1) + 2(1-t)t*x(2) + t^2*x(3)
+// y = (1-t)^2*y(1) + 2(1-t)t*y(2) + t^2*y(3)
+
+var calculateBezierCurve3 = (p1, p2, curveP, t) => {
+	let calculatedX = 0;
+	let calculatedY = 0;
+
+	calculatedX = (1 - t) ** 2 * p1.x + 2 * (1 - t) * t * curveP.x + t ** 2 * p2.x;
+	calculatedY = (1 - t) ** 2 * p1.y + 2 * (1 - t) * t * curveP.y + t ** 2 * p2.y;
+
+	return { x : calculatedX , y : calculatedY };
+};
+
+var calculateBezierCurve4 = (p1, p2, curveP1, curveP2 , t) => {
+	let calculatedX = 0;
+	let calculatedY = 0;
+
+	calculatedX = (1 - t)**3*p1.x + 3*(1-t)**2*t*curveP1.x + 3*(1 - t)*t**2*curveP2.x + t**3*p2.x;
+	calculatedY = (1 - t)**3*p1.y + 3*(1-t)**2*t*curveP1.y + 3*(1 - t)*t**2*curveP2.y + t**3*p2.y;
+	
+	return { x : calculatedX , y : calculatedY };
+};
+
+var firstPoint = new Point(10, 70);
+var secondPoint = new Point(300, 40);
+var curvePoint = new Point(50, 160);
+var anotherCurvePoint = new Point(100, 10);
+
+ctx.beginPath();
+
+let t = 0;
+let i = 0;
+let tStep = 0.03;
+let pathArr = [];
+
+while (t < 1) {
+	
+	t += tStep;
+	
+	let currentPoint = calculateBezierCurve4(firstPoint, secondPoint, curvePoint , anotherCurvePoint , t); 
+
+	pathArr[i] = currentPoint;
+
+	// ctx.fillStyle = "red";
+	// ctx.fillRect(currentPoint.x , currentPoint.y , 2 , 2);
+	
+	let prevPoint;
+	if ( pathArr[i - 1] ) {
+		prevPoint = pathArr[i - 1];
+
+		ctx.moveTo( prevPoint.x , prevPoint.y );
+		ctx.lineTo( currentPoint.x , currentPoint.y );
+		
+	}
+
+	i += 1;
+}
+
+ctx.stroke();
+ctx.closePath();
+
+</script>
